@@ -1,0 +1,13 @@
+${AnsiColor.BLUE}
+    __  __           __        __            ____                        __
+   / / / /___  _____/ /_____ _/ /           / __ \____ _____ ___  ____  / /___  ____  ____ _
+  / /_/ / __ \/ ___/ __/ __ `/ /  ______   / /_/ / __ `/ __ `__ \/ __ \/ / __ \/ __ \/ __ `/
+ / __  / /_/ (__  ) /_/ /_/ / /  /_____/  / ____/ /_/ / / / / / / /_/ / / /_/ / / / / /_/ /
+/_/ /_/\____/____/\__/\__,_/_/           /_/    \__,_/_/ /_/ /_/ .___/_/\____/_/ /_/\__,_/
+                                                              /_/
+${AnsiColor.DEFAULT}
+ .:: ${AnsiColor.GREEN}Spring Boot Version${AnsiColor.DEFAULT} :: ${spring-boot.version}
+ .:: ${AnsiColor.GREEN}OpenJDK Version${AnsiColor.DEFAULT}     :: ${java.version}
+ .:: ${AnsiColor.BRIGHT_GREEN}Application Name${AnsiColor.DEFAULT}    :: ${spring.application.name}
+ .:: ${AnsiColor.BLUE}${springdoc.properties.organization-url}${AnsiColor.DEFAULT} :: ${springdoc.properties.developer-name}
+ .:: ${AnsiColor.BLUE}Información Adicional${AnsiColor.DEFAULT} :: ${springdoc.properties.developer-linkedin}
