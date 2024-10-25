@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sebastian.hostal_pamplona.common.helpers.ConvertsTransactions;
 import org.sebastian.hostal_pamplona.common.utils.ApiResponseConsolidation;
 import org.sebastian.hostal_pamplona.common.utils.CustomPagedResourcesAssembler;
-import org.sebastian.hostal_pamplona.common.utils.ErrorsValidationsResponse;
 import org.sebastian.hostal_pamplona.common.utils.ResponseWrapper;
 import org.sebastian.hostal_pamplona.common.validations.BindingValidations;
 import org.sebastian.hostal_pamplona.dtos.create.CreateCategoryDTO;
@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -32,6 +34,7 @@ public class CategoryController {
 
     private final ICategoryService categoryService;
     private final BindingValidations bindingValidations;
+    private final ConvertsTransactions convertsTransactions;
     private final CustomPagedResourcesAssembler<Category> customPagedResourcesAssembler;
 
     @PostMapping("/create")
@@ -42,39 +45,64 @@ public class CategoryController {
             BindingResult result
     ){
 
-        ResponseEntity<ApiResponseConsolidation<Object>> validator = bindingValidations.validationBindings(result);
-        if( validator.getStatusCode().equals(HttpStatus.OK) ){
+        //? ******************************
+        //? Validamos primero los campos
+        //? ******************************
+        ResponseEntity<Object> validator = bindingValidations.validationBindings(result);
+        Object responseValidator = validator.getBody();
 
+        if( responseValidator == null ){
+
+            //? *********************************
             //? Intentamos realizar el registro
+            //? *********************************
             ResponseWrapper<Category> newCategory = categoryService.create(categoryRequest);
 
             //? Si no ocurre algún error, entonces registramos :)
             if( newCategory.getData() != null ){
                 return ResponseEntity.status(HttpStatus.CREATED)
-                        .body(new ApiResponseConsolidation<>(
-                                newCategory.getData(),
-                                new ApiResponseConsolidation.Meta(
-                                        "Categoría Registrada Correctamente.",
-                                        HttpStatus.CREATED.value(),
-                                        LocalDateTime.now()
-                                )
-                        ));
+                    .body(new ApiResponseConsolidation<>(
+                            newCategory.getData(),
+                            new ApiResponseConsolidation.Meta(
+                                    "Categoría Registrada Correctamente.",
+                                    HttpStatus.CREATED.value(),
+                                    LocalDateTime.now()
+                            )
+                    ));
             }
 
+            //? ****************************************************
             //? Estamos en este punto, el registro no fue correcto
+            //? ****************************************************
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponseConsolidation<>(
+                        null,
+                        new ApiResponseConsolidation.Meta(
+                                newCategory.getErrorMessage(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                LocalDateTime.now()
+                        )
+                ));
+
+        }else{
+
+            //? ****************************************************
+            //? Devolvemos los errores por campos para mostrar
+            //? ****************************************************
+            Map<String, String> validationErrors = (Map<String, String>) responseValidator;
+            List<Map<String, String>> errorsList = convertsTransactions.convertErrorsToList(validationErrors);
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponseConsolidation<>(
-                            null,
+                            errorsList,
                             new ApiResponseConsolidation.Meta(
-                                    newCategory.getErrorMessage(),
+                                    "Error en los campos proporcionados",
                                     HttpStatus.BAD_REQUEST.value(),
                                     LocalDateTime.now()
                             )
                     ));
 
         }
-
-        return null;
 
     }
 

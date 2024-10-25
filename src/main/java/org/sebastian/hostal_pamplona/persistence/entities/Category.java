@@ -8,8 +8,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
+import java.util.Date;
+
 @Entity
-@Table(name = "TBL_PERSONS")
+@Table(name = "TBL_CATEGORIES")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,5 +40,21 @@ public class Category {
     @Column(name = "STATUS" )
     @Comment("Estado de la categoría")
     private Boolean status;
+
+    @Column(name = "USER_CREATED", nullable = true, length = 100 )
+    @Comment("Usuario que creó la categoría")
+    private String userCreated;
+
+    @Column(name = "DATE_CREATED", nullable = true )
+    @Comment("Fecha creación de la categoría")
+    private Date dateCreated;
+
+    @Column(name = "USER_UPDATED", nullable = true, length = 100 )
+    @Comment("Usuario que actualizó la categoría")
+    private String userUpdated;
+
+    @Column(name = "DATE_UPDATED", nullable = true )
+    @Comment("Fecha actualización de la categoría")
+    private Date dateUpdated;
 
 }
