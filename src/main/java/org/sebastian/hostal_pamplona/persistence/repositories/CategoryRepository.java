@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSpecificationExecutor<Category> {
 
     @Query("SELECT c FROM Category c " +
@@ -18,5 +20,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSp
             @Param("search") String search,
             Pageable pageable
     );
+
+    @Query("SELECT c FROM Category c WHERE UPPER(c.name) = UPPER(:categoryName)")
+    Optional<Category> getCategoryByName(String categoryName);
 
 }
