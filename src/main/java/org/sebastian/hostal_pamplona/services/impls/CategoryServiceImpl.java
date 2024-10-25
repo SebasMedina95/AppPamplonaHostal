@@ -55,21 +55,42 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Category> findAll(String search, Pageable pageable) {
         return null;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseWrapper<Category> findById(Long id) {
-        return null;
+
+        try{
+
+            Optional<Category> categoryOptional = categoryRepository.findById(id);
+            if( categoryOptional.isPresent() ){
+                Category category = categoryOptional.orElseThrow();
+                return new ResponseWrapper<>(category, "Categoría encontrada por ID correctamente");
+            }
+
+            return new ResponseWrapper<>(null, "La categoría no pudo ser encontrado por el ID " + id);
+
+        }catch (Exception err){
+
+            log.error("Ocurrió un error al intentar obtener la categoría por ID {}, detalles: ", id, err);
+            return new ResponseWrapper<>(null, "La categoría no pudo ser encontrado por el ID");
+
+        }
+
     }
 
     @Override
+    @Transactional
     public ResponseWrapper<Object> update(Long id, UpdateCategoryDTO category) {
         return null;
     }
 
     @Override
+    @Transactional
     public ResponseWrapper<Object> delete(Long id) {
         return null;
     }

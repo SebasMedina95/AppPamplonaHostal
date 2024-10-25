@@ -16,10 +16,7 @@ import org.sebastian.hostal_pamplona.services.ICategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -103,6 +100,55 @@ public class CategoryController {
                     ));
 
         }
+
+    }
+
+
+    @GetMapping("/find-by-id/{id}")
+    @Operation(summary = "Obtener categorías por ID", description = "Obtener una categoría dado el ID")
+    public ResponseEntity<ApiResponseConsolidation<Category>> findById(@PathVariable String id){
+
+        ResponseWrapper<Category> category;
+
+        //Validamos que el ID que nos proporcionan por la URL sea válido
+        try {
+            Long categoryId = Long.parseLong(id);
+            category = categoryService.findById(categoryId);
+        }catch (NumberFormatException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponseConsolidation<>(
+                            null,
+                            new ApiResponseConsolidation.Meta(
+                                    "El ID proporcionado es inválido para obtener por ID.",
+                                    HttpStatus.OK.value(),
+                                    LocalDateTime.now()
+                            )
+                    ));
+        }
+
+        //Si es diferente de null implica que lo encontramos
+        if( category.getData() != null ){
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponseConsolidation<>(
+                            category.getData(),
+                            new ApiResponseConsolidation.Meta(
+                                    "Categoría obtenida por ID.",
+                                    HttpStatus.OK.value(),
+                                    LocalDateTime.now()
+                            )
+                    ));
+        }
+
+        //En caso contrario, algún null, ocurrió un error
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponseConsolidation<>(
+                        null,
+                        new ApiResponseConsolidation.Meta(
+                                category.getErrorMessage(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                LocalDateTime.now()
+                        )
+                ));
 
     }
 
