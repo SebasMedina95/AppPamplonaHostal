@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    host: localhost
+    username: pamplona
+    password: pamplona123
+    port: 9876
+    db: hostal_pamplona_db
+    url: jdbc:postgresql://localhost:9876/hostal_pamplona_db
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+custom:
+  activeProfileName: local
