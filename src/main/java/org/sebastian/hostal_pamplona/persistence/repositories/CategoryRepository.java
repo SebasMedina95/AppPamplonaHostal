@@ -24,7 +24,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSp
     @Query("SELECT c FROM Category c WHERE UPPER(c.name) = UPPER(:categoryName)")
     Optional<Category> getCategoryByName(String categoryName);
 
-    @Query("SELECT c FROM Category c WHERE UPPER(c.name) = UPPER(:categoryName) AND t.id <> :id")
+    @Query("SELECT c FROM Category c WHERE UPPER(c.name) = UPPER(:categoryName) AND c.id <> :id")
     Optional<Category> getCategoryByNameForEdit(String categoryName, Long id);
 
 }
