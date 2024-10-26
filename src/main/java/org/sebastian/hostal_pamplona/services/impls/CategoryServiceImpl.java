@@ -116,7 +116,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
             }else{
 
-                log.info("Categoría no encontrada por el id {}", id);
+                log.info("Categoría no encontrada para actualizar por el id {}", id);
                 return new ResponseWrapper<>(null, "La categoría no fue encontrada");
 
             }
@@ -133,6 +133,36 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     @Transactional
     public ResponseWrapper<Object> delete(Long id) {
-        return null;
+
+        try{
+
+            Optional<Category> categoryOptional = categoryRepository.findById(id);
+
+            if( categoryOptional.isPresent() ){
+
+                Category categoryDb = categoryOptional.orElseThrow();
+
+                //? Vamos a actualizar si llegamos hasta acá
+                //? ESTO SERÁ UN ELIMINADO LÓGICO!
+                categoryDb.setStatus(false);
+                categoryDb.setUserUpdated("usuario123");
+                categoryDb.setDateUpdated(new Date());
+
+                return new ResponseWrapper<>(categoryRepository.save(categoryDb), "Categoría Eliminada Correctamente");
+
+            }else{
+
+                log.info("Categoría no encontrada para eliminar por el id {}", id);
+                return new ResponseWrapper<>(null, "La categoría no fue encontrado");
+
+            }
+
+        }catch (Exception err) {
+
+            log.error("Ocurrió un error al intentar eliminar lógicamente la categoría por ID, detalles ...", err);
+            return new ResponseWrapper<>(null, "La categoría no pudo ser eliminada");
+
+        }
+
     }
 }

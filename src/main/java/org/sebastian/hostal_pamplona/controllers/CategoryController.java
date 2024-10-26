@@ -294,4 +294,51 @@ public class CategoryController {
 
     }
 
+    @DeleteMapping("/delete-by-id/{id}")
+    @Operation(summary = "Eliminar una categoría", description = "Eliminar una categoría pero de manera lógica")
+    public ResponseEntity<ApiResponseConsolidation<Object>> delete(
+            @PathVariable String id
+    ){
+
+        ResponseWrapper<Object> categoryUpdate;
+
+        try {
+            Long categoryId = Long.parseLong(id);
+            categoryUpdate = categoryService.delete(categoryId);
+        }catch (NumberFormatException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponseConsolidation<>(
+                            null,
+                            new ApiResponseConsolidation.Meta(
+                                    "El ID proporcionado es inválido.",
+                                    HttpStatus.OK.value(),
+                                    LocalDateTime.now()
+                            )
+                    ));
+        }
+
+        if( categoryUpdate.getData() != null ){
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponseConsolidation<>(
+                            categoryUpdate.getData(),
+                            new ApiResponseConsolidation.Meta(
+                                    "Categoría Eliminada Correctamente.",
+                                    HttpStatus.OK.value(),
+                                    LocalDateTime.now()
+                            )
+                    ));
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponseConsolidation<>(
+                        null,
+                        new ApiResponseConsolidation.Meta(
+                                categoryUpdate.getErrorMessage(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                LocalDateTime.now()
+                        )
+                ));
+
+    }
+
 }
