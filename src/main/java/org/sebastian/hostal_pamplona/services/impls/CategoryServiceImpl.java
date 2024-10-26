@@ -13,8 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -57,7 +56,9 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     @Transactional(readOnly = true)
     public Page<Category> findAll(String search, Pageable pageable) {
-        return null;
+
+        return categoryRepository.findGeneralCategoriesByCriteria(search, pageable);
+
     }
 
     @Override
@@ -86,7 +87,47 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     @Transactional
     public ResponseWrapper<Object> update(Long id, UpdateCategoryDTO category) {
-        return null;
+
+        try{
+
+            Optional<Category> categoryOptional = categoryRepository.findById(id);
+            if( categoryOptional.isPresent() ){
+
+                Category categoryDb = categoryOptional.orElseThrow();
+
+                //? Validemos que no se repita la categoría
+                String categoryName = category.getName().trim().toUpperCase();
+                Optional<Category> getThematicOptionalName = categoryRepository.getCategoryByNameForEdit(categoryName, id);
+
+                if( getThematicOptionalName.isPresent() ){
+                    log.info("El nombre de la categoría ya se encuentra registrado a nivel de una categoría diferente a la del id dado");
+                    return new ResponseWrapper<>(null, "El nombre de la temática ya está registrado");
+                }
+
+                //? Vamos a actualizar si llegamos hasta acá
+                categoryDb.setName(categoryName);
+                categoryDb.setDescription(category.getDescription());
+                categoryDb.setUserUpdated(dummiesUser);
+                categoryDb.setDateUpdated(new Date());
+
+                Category saveCategory = categoryRepository.save(categoryDb);
+
+                return new ResponseWrapper<>(saveCategory, "Categoría Actualizada Correctamente");
+
+            }else{
+
+                log.info("Categoría no encontrada por el id {}", id);
+                return new ResponseWrapper<>(null, "La categoría no fue encontrada");
+
+            }
+
+        }catch (Exception err){
+
+            log.error("Ocurrió un error al intentar actualizar la categoría por ID, detalles ...", err);
+            return new ResponseWrapper<>(null, "La categoría no pudo ser actualizada");
+
+        }
+
     }
 
     @Override

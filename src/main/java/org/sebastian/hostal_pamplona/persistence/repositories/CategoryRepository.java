@@ -16,12 +16,15 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSp
             "WHERE c.status = true AND" +
             "(UPPER(c.name) LIKE UPPER(CONCAT('%', :search, '%')) OR " +
             "UPPER(c.description) LIKE UPPER(CONCAT('%', :search, '%')))")
-    Page<Category> findAll(
+    Page<Category> findGeneralCategoriesByCriteria(
             @Param("search") String search,
             Pageable pageable
     );
 
     @Query("SELECT c FROM Category c WHERE UPPER(c.name) = UPPER(:categoryName)")
     Optional<Category> getCategoryByName(String categoryName);
+
+    @Query("SELECT c FROM Category c WHERE UPPER(c.name) = UPPER(:categoryName) AND t.id <> :id")
+    Optional<Category> getCategoryByNameForEdit(String categoryName, Long id);
 
 }
